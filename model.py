@@ -6,7 +6,7 @@ class heat_model:
         self.d = spatial_dimension
         self.domain = torch.tensor(()).new_zeros(size=(spatial_dimension + 1, 2))
         self.T = 1.
-        spatial_dimension[0] = torch.tensor([0, self.T])
+        self.domain[0] = torch.tensor([0, self.T])
         for i in range(1, spatial_dimension + 1):
             self.domain[i] = torch.tensor([0, 1])
 
