@@ -1,9 +1,14 @@
 import torch
 
 class heat_model:
-    def __init__(self, param, spatial_dimension):
+    def __init__(self, spatial_dimension, *param):
         self.param = param
         self.d = spatial_dimension
+        self.domain = torch.tensor(()).new_zeros(size=(spatial_dimension + 1, 2))
+        self.T = 1.
+        spatial_dimension[0] = torch.tensor([0, self.T])
+        for i in range(1, spatial_dimension + 1):
+            self.domain[i] = torch.tensor([0, 1])
 
     def residual(self, x, network):
         x.requires_grad = True
@@ -24,10 +29,10 @@ class heat_model:
     def initial_condition(self, x):
         return torch.mean(x ** 2, dim=1).reshape(-1, 1)
 
-    def exact_solution(self, x, t):
-        return self.initial_condition(x) + 2 * t
+    def exact_solution(self, x):
+        return self.initial_condition(x) + 2 * x[:, 0].reshape(-1, 1)
 
-    def boundary_condition(self, x, t):
-        return self.exact_solution(x, t)
+    def boundary_condition(self, x):
+        return self.exact_solution(x)
 
 
