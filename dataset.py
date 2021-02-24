@@ -31,10 +31,19 @@ def assemble_dataset_boundary(model, size_boundary):
     return torch.cat((x, model.exact_solution(x)), 1)
 
 def assemble_datasets(model, *sizes):
-    return [assemble_dataset_interior(model, sizes[0]),
-            assemble_dataset_boundary(model, sizes[1]),
-            assemble_dataset_initial(model, sizes[2]),
-            assemble_dataset_measurements(model, sizes[3])]
+    if sizes[3] == 0:
+        return [assemble_dataset_interior(model, sizes[0]),
+                assemble_dataset_boundary(model, sizes[1]),
+                assemble_dataset_initial(model, sizes[2])]
+    elif sizes[2] == 0:
+        return [assemble_dataset_interior(model, sizes[0]),
+                assemble_dataset_initial(model, sizes[2]),
+                assemble_dataset_measurements(model, sizes[3])]
+    else:
+        return [assemble_dataset_interior(model, sizes[0]),
+                assemble_dataset_boundary(model, sizes[1]),
+                assemble_dataset_initial(model, sizes[2]),
+                assemble_dataset_measurements(model, sizes[3])]
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, model, *sizes):
