@@ -1,7 +1,6 @@
 import torch
 
-def L2_NORM(data):
-    return torch.mean(data ** 2).item()
+L2_NORM = lambda data : torch.mean(data ** 2).item()
 
 def relative_test_error(data_test, network):
     true_label = data_test[:, -1]
@@ -15,9 +14,9 @@ class loss:
         self.model = model
 
     def get_measurements_loss(self, data_measurements):
-        true_label = data_measurements[:, -1].reshape(-1,)
+        true_label = data_measurements[:, -1]
         features = data_measurements[:, 0:-1]
-        pred_label = self.network(features).reshape(-1,)
+        pred_label = self.network(features)
         return L2_NORM(true_label - pred_label)
 
     def get_regularization_loss(self, p):
@@ -26,21 +25,21 @@ class loss:
             lp_regularization = lp_regularization + torch.norm(param, p) ** p
         return lp_regularization.item()
 
-    def get_pde_loss(self, data_internal):
-        features = data_internal
-        pde_residual = self.model.residual(features)
+    def get_pde_loss(self, data_interior):
+        features = data_interior
+        pde_residual = self.model.residual(features, self.network)
         return L2_NORM(pde_residual)
 
     def get_boundary_condition_loss(self, data_bc):
         features = data_bc[:, 0:-1]
-        true_label = self.model.boundary_condition(features)
+        true_label = data_bc[:, -1]
         pred_label = self.network(features)
         return L2_NORM(true_label - pred_label)
 
     def get_initial_condition_loss(self, data_ic):
         features = data_ic[:, 0:-1]
         true_label = data_ic[:, -1]
-        pred_label = self.model.initial_condition(features)
+        pred_label = self.model.network(features)
         return L2_NORM(true_label - pred_label)
 
 

@@ -1,1 +1,1 @@
-def train(network, optimizer, epochs)
+def train(network, data_loaders, optimizer, epochs):
