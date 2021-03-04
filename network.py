@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-class network(nn.Module):
+class Network(nn.Module):
     def __init__(self, input_dim, out_dim, hyperparam_dict):
         super(network, self).__init__()
         self.in_dim = input_dim
