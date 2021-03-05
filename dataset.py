@@ -7,11 +7,11 @@ def rescale(x, domain):
         x[:, 0] = x[:, 0] * (domain[i][1] - domain[i][0]) + domain[i][0]
     return x
 
-def assemble_dataset_interior(model, size_interior):
+def assemble_dataset_interior(domain, size_interior):
     """ Input PDE model and size and returns the interior points dataset """ 
     """ Unlabeled dataset as torch tensor """ 
-    dim = model.domain.shape[0]
-    return rescale(torch.rand(size_interior, dim), model.domain)
+    dim = domain.shape[0]
+    return rescale(torch.rand(size_interior, dim), domain)
 
 def assemble_dataset_initial(model, size_initial):
     """ Input PDE model and size and returns the initial time points dataset """

@@ -10,6 +10,7 @@ def relative_test_error(data_test, network):
 
 class Loss:
     def __init__(self, network, model):
+        """ Constructor """
         self.network = network
         self.model = model
 
@@ -34,7 +35,7 @@ class Loss:
         return L2_NORM(true_label - pred_label)
 
     def get_measurements_loss(self, data_measurements):
-        """" Computes the observed data loss """
+        """ Computes the observed data loss """
         features = data_measurements[:, 0:-1] 
         true_label = data_measurements[:, -1]
         pred_label = self.network(features)
