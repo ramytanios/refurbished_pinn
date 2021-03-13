@@ -42,22 +42,22 @@ def assemble_dataset_boundary(model, size_boundary):
 
 class Dataset(torch.utils.data.Dataset):
     """ Dataset class """
-    def __init__(self, assemble_dataset, model, sizes):
+    def __init__(self, assemble_dataset, model, size):
         """ Constructor that assemble the dataset """
-        self.datasets = assemble_dataset(model, sizes)
+        self.datasets = assemble_dataset(model, size)
 
     def __getitem__(self, i):
         """ Input index i and return the sample at i """
         return self.datasets[i]
 
     def __len__(self):
-        """ Returns the number of samples in the dataset """ 
+        """ Returns the number of samples in the dataset """
         return self.datasets.shape[0]
 
 def data_loaders(model, batch_size, *sizes):
     """ Inputs model PDE, batch_size and training sets sizes and returns 
         a dataloader for each dataset """
-    dataset_interior = Dataset(assemble_dataset_interior, model, sizes[0])
+    dataset_interior = Dataset(assemble_dataset_interior, model.domain, sizes[0])
     dataset_boundary = Dataset(assemble_dataset_boundary, model, sizes[1])
     dataset_initial = Dataset(assemble_dataset_initial, model, sizes[2])
     dataset_measurements = Dataset(assemble_dataset_measurements, model, sizes[3])

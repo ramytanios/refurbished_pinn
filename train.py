@@ -1,9 +1,12 @@
 import dataset
-import loss 
+import loss
+import torch
+import numpy as np
+import matplotlib.pyplot as plt
 
 def train_network(model, network, dataloaders_list, optimizer,
                   number_of_epochs, batch_size, hyperparam_dict):
-    """ Training the network """
+    """ Training the network for one combination of hyperparameters """
     loader_interior = dataloaders_list[0]
     loader_boundary = dataloaders_list[1]
     loader_initial = dataloaders_list[2]
@@ -14,6 +17,7 @@ def train_network(model, network, dataloaders_list, optimizer,
 
     # Test dataset 
     test_domain = model.domain
+    T = model.domain[0][1]
     test_domain[0] = torch.tensor([T, T])
     test_data = dataset.assemble_dataset_interior(test_domain, 100) 
     test_data = torch.cat([test_data, model.exact_solution(test_data)], dim=1)
@@ -23,36 +27,35 @@ def train_network(model, network, dataloaders_list, optimizer,
     test_error_history = []
     for epoch in number_of_epochs:
         epoch_loss = 0.
-        count = 0
-        test_error_history.append(loss.relative_test_error(data_test, network))
-        for interior_batch,
-            boundary_batch, 
-            initial_batch,
-            meas_batch in zip(loader_interior, loader_boundary, loader_initial, loader_meas):
+        test_error_history.append(loss.relative_test_error(test_data, network))
+        for (interior_batch,
+             boundary_batch,
+             initial_batch,
+             meas_batch) in zip(loader_interior, loader_boundary, loader_initial, loader_meas):
 
-                loss = Loss(network, model)
-                
-                optimizer.zero_grad()
+                def closure():
+                    loss = loss.Loss(network, model)
+                    optimizer.zero_grad()
 
-                pde_loss = loss.get_pde_loss(interior_batch)
-                boundary_loss = loss.get_boundary_condition_loss(boundary_batch)
-                initial_loss = loss.get_initial_condition_loss(initial_batch)
-                meas_loss = loss.get_measurements_loss(meas_batch)
-                reg_loss = loss.get_regularization_loss(p_exponent)
+                    pde_loss = loss.get_pde_loss(interior_batch)
+                    boundary_loss = loss.get_boundary_condition_loss(boundary_batch)
+                    initial_loss = loss.get_initial_condition_loss(initial_batch)
+                    meas_loss = loss.get_measurements_loss(meas_batch)
+                    reg_loss = loss.get_regularization_loss(p_exponent)
 
-                batch_loss = lambda_res * pde_loss +
-                             boundary_loss +
-                             meas_loss + 
-                             lambda_Lp * reg_loss
+                    batch_loss = lambda_res * pde_loss + \
+                                 boundary_loss + \
+                                 initial_loss + \
+                                 meas_loss + \
+                                 lambda_Lp * reg_loss
 
-                epoch_loss += batch_loss
-                count += 1
-                batch_loss.backward()
-                optimizer.step()
+                    epoch_loss += batch_loss
+                    batch_loss.backward()
+                    return batch_loss
 
-        history.append(epoch_loss / count)
+                optimizer.step(closure = closure)
+
+        history.append(epoch_loss / len(loader_interior))
 
     return np.array(history), np.array(test_error_history)
-
-                
 

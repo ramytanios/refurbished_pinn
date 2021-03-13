@@ -3,7 +3,7 @@ from torch import nn
 
 class Network(nn.Module):
     def __init__(self, input_dim, out_dim, hyperparam_dict):
-        super(network, self).__init__()
+        super(Network, self).__init__()
         self.in_dim = input_dim
         self.out_dim = out_dim
         self.num_h_layers = int(hyperparam_dict["hidden_layers"])

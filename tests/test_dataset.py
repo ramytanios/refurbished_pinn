@@ -7,7 +7,17 @@ import dataset
 import matplotlib.pyplot as plt
 
 my_model = model.heat_model(1, 0.5)
-loaders = dataset.data_loaders(my_model, 20, 100, 100, 50, 50)
+interior_size = 50
+boundary_size = 0
+initial_size = 50
+meas_size = 50
+batch_size = 1 * (interior_size + boundary_size + initial_size + meas_size)
+loaders = dataset.data_loaders(my_model,
+                               int(batch_size),
+                               interior_size,
+                               boundary_size,
+                               interior_size,
+                               meas_size)
 
 for (x, y, z, w) in zip(loaders[0], loaders[1], loaders[2], loaders[3]):
     print ("hello")

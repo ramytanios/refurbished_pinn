@@ -31,7 +31,7 @@ class Loss:
         """ Compute the initial condition loss """
         features = data_ic[:, 0:-1]
         true_label = data_ic[:, -1].reshape(-1,)
-        pred_label = self.model.network(features).reshape(-1,)
+        pred_label = self.network(features).reshape(-1,)
         return L2_NORM(true_label - pred_label)
 
     def get_measurements_loss(self, data_measurements):
